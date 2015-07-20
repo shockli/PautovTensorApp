@@ -20,39 +20,43 @@ public class OnLongClickListenerPeopleRecord implements View.OnLongClickListener
         context = view.getContext();
         id = view.getTag().toString();
 
-        new AlertDialog.Builder(context).setTitle("Профайл")
-                .setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
+        TableControllerPeople tempTableControllerPeople = new TableControllerPeople(context);
+        ObjectPeople objectPeople = tempTableControllerPeople.readSingleRecord(Integer.parseInt(id));
+        String name = objectPeople.Firstname;
+        String lastname = objectPeople.Lastname;
 
-                        if (item == 0) {
-                            editRecord(Integer.parseInt(id));
+        new AlertDialog.Builder(context).setTitle(name + " " + lastname)
+        .setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
 
-                        }
-                        else if (item == 1) {
-                           boolean deleteSuccessful = new TableControllerPeople(context).delete(id);
-                            if (deleteSuccessful){
-                                Toast.makeText(context, "Запись удалена!", Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(context, "Запись удалить не удалось (", Toast.LENGTH_SHORT).show();
-                            }
+                if (item == 0) {
+                    editRecord(Integer.parseInt(id));
 
-                            ((MainActivity) context).countRecords();
-                            ((MainActivity) context).readRecords();
-                        }
-                        dialog.dismiss();
+                } else if (item == 1) {
+                    boolean deleteSuccessful = new TableControllerPeople(context).delete(id);
+                    if (deleteSuccessful) {
+                        Toast.makeText(context, "Запись удалена!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Запись удалить не удалось (", Toast.LENGTH_SHORT).show();
                     }
-                }).show();
+
+                    ((MainActivity) context).countRecords();
+                    ((MainActivity) context).readRecords();
+                }
+                dialog.dismiss();
+            }
+        }).show();
 
         return false;
     }
 
-    public void editRecord(final int studentId) {
+    public void editRecord(final int PeopleId) {
         final TableControllerPeople tableControllerPeople = new TableControllerPeople(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View formElementsView = inflater.inflate(R.layout.input_form, null, false);
         final EditText editTextStudentFirstname = (EditText) formElementsView.findViewById(R.id.editTextPeopleFirstname);
         final EditText editTextStudentEmail = (EditText) formElementsView.findViewById(R.id.editTextPeopleLastname);
-        ObjectPeople objectPeople = tableControllerPeople.readSingleRecord(studentId);
+        ObjectPeople objectPeople = tableControllerPeople.readSingleRecord(PeopleId);
         editTextStudentFirstname.setText(objectPeople.Firstname);
         editTextStudentEmail.setText(objectPeople.Lastname);
 
@@ -63,7 +67,7 @@ public class OnLongClickListenerPeopleRecord implements View.OnLongClickListener
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 ObjectPeople objectPeople = new ObjectPeople();
-                                objectPeople.id = studentId;
+                                objectPeople.id = PeopleId;
                                 objectPeople.Firstname = editTextStudentFirstname.getText().toString();
                                 objectPeople.Lastname = editTextStudentEmail.getText().toString();
                                 boolean updateSuccessful = tableControllerPeople.update(objectPeople);
